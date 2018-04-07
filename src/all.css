@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Roboto');
+
+
+*{margin:0;padding:0;text-decoration:none;}
+
+
+:root{
+  --sansFamily: "Open Sans";
+  --serifFamily: "Roboto";
+}
+
+body {
+  background:#eee;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/**
+ * @ 
+ */
+main{
+  display:flex;
+  background:#fff;
+  width:60vw;
+  margin:10vh auto;
+  align-content:center;
+  justify-content: center;
+  flex-wrap:wrap;
+}
+
+main h1,
+main h3{
+  flex-basis:100%;
+  font-family:var(--sansFamily);
+  margin:1% 0%;
+  text-align:center;
+  flex-direction: column;
+}
+
+main hr{
+  width:100%;
+  border:0px;
+  border-top:1px solid #d6d8da;
+}
+
+/**
+ * @ 
+ */
+main form{flex-basis:44%;padding:2%;}
+main form fieldset{display:block;border:0px;padding:2% 1%;padding-bottom:0.5%;border-bottom:2px dashed #666;}
+main form label{display:inline-block;font-family:var(--fontFamily);font-size:1rem;position: relative;vertical-align:text-bottom;}
+main form label sub{position: absolute;bottom:calc(-102% + -24px);left:0;}
+main form input{display:inline-block;font-family:var(--fontFamily);padding:1%;float:right;border:0px;text-align:right;outline:0px;vertical-align:text-bottom;}
+main form select{display:inline-block;text-align:right;float:right;border:0px;outline:0px;cursor:pointer;vertical-align:text-bottom;}
+main form button{display:block;background:transparent;padding:7.5px 30px;border:2px solid #666;border-radius:50px;margin:5% auto;text-align:center;overflow: hidden;white-space: nowrap;cursor:pointer;transition:all 0.25s ease-out;outline:0px;}
+main form button:hover{background:#2f2f2f;color:white;border-color:#2f2f2f;}
+
+/**
+ * @ 
+ */
+main section{flex-basis:44%;padding:2%;}
+main section:last-child{border-left:1px solid #eee;}
+main section h1{display:block;color:#666;width:100%;font-family:var(--serifFamily);font-size:1.5rem;padding-bottom:1%;}
+main section ul{}
+main section ul li{display:block;font-size:1.25rem;border-bottom:1px solid rgba(0,0,0,0.5);}
+main section ul li button{display:inline-block;background:#2f2f2f;color:#fff;width:24px;height:24px;border:0px;border-radius:50%;text-align: center;font-size:0.9rem;margin-left:2.5%;margin-bottom:1%;vertical-align:middle;}
