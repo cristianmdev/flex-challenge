@@ -1,9 +1,10 @@
-
-
 /**
  * @desc React
  */
 import React            from 'react';
+
+/* @ */
+import Store            from '../../../store';
 
 /**
  * @name FormView
@@ -21,30 +22,57 @@ class VisitantsView extends React.Component{
     super(props);
     
     /* @ */
-    this.onRemove      = props.onRemove.bind(this);
-    this.onSelect      = props.onSelect.bind(this);
-  }
-
-  onRemoveVisit(key){
-
+    this.handleRemoveVisit      = this.handleRemoveVisit.bind(this);
+    this.handleSelectVisit      = this.handleSelectVisit.bind(this);
+    this.eachVisitants      = this.eachVisitants.bind(this);
+  
     /* @ */
-    let visitants = this.props.visitants;
+    this.state = {
+      visitants: [],
+      user     : {
+        "name" : 'Desconocido',
+        "date" : Store.getState().today
+      },
+    };
+
+    /* @ Changes in Store */
+    Store.subscribe(() => {
+      this.setState({
+        visitants: Store.getState().visitants,
+        user     : Store.getState().user
+      });
+    });
     
-    /* @ */
-    delete visitants[key];
-
-    /* @ */
-    this.props.onRemove(visitants);
-
   }
 
-  onSelectVisit(key){
+  /**
+   * 
+   * @param {number} key - Key of visit in Store
+   */
+  handleRemoveVisit(key){
 
     /* @ */
-    let visitants = this.props.visitants;
+    Store.dispatch({
+      type      : "DELETE_VISIT",
+      visitKey  : key
+    })
+  
+  }
+
+  /**
+   * 
+   * @param {number} key - Key of a visitant old 
+   */
+  handleSelectVisit(key){
 
     /* @ */
-    this.props.onSelect(visitants[key]);
+    let visitant = Store.getState().visitants[key];
+        
+    /* @ */
+    Store.dispatch({
+      type : "UPDATE_USER",
+      user : visitant
+    });
 
   }
 
@@ -53,16 +81,19 @@ class VisitantsView extends React.Component{
   * @desc Structure of a visitant
   * @return <LI>
   */
-  insertVisitants(person,key){
+  eachVisitants(person,key){
     return (<li key={key} >
-            <h1 onClick={() => this.onSelectVisit(key)}>
+            <h1 onClick={() => this.handleSelectVisit(key)}>
             {person.name} - {person.country} - {person.date}
             </h1>
-            <button onClick={() => this.onRemoveVisit(key)}>X</button>
+            <button onClick={() => this.handleRemoveVisit(key)}>X</button>
           </li>);
   }
 
 
+  /**
+   * @desc
+   */
   render(){
 
     return (
@@ -71,8 +102,8 @@ class VisitantsView extends React.Component{
         <ul>
           {
             (
-              this.props.visitants.length > 0 
-                  ? this.props.visitants.map(this.insertVisitants.bind(this))
+              this.state.visitants.length > 0 
+                  ? this.state.visitants.map(this.eachVisitants)
                   : ''
             )
           }

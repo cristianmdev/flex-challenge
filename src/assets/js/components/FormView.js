@@ -1,8 +1,12 @@
-
 /**
  * @desc React
  */
 import React            from 'react';
+
+/**
+ * @desc 
+ */
+import Store            from '../../../store';
 
 /* @ Helper */
 String.prototype.reverse = function(){
@@ -23,24 +27,33 @@ class FormView extends React.Component{
 
     /* @ */
     super(props);
-    
-    /* @ */
-    let date    = new Date(),
-        thisYear = date.getFullYear(),
-        thisMonth= date.getMonth() < 8 ? "0"+(date.getMonth()+1) : date.getMonth()+1,
-        thisDay  = date.getDate() < 9  ? "0"+date.getDate()      : date.getDate();
 
     /* @ */
+    this.addVisit           = this.addVisit.bind(this);
+    this.countryElement     = this.countryElement.bind(this);
+    this.handleChangeName   = this.handleChangeName.bind(this);
+    this.handleChangeDate   = this.handleChangeDate.bind(this);
+
+    /* @ Data Local */
     this.state = {
-      "countrys"    : [],
-      "today"       : `${thisYear}-${thisMonth}-${thisDay}`
+      countrys : [],
+      user     : {
+        "name" : 'Desconocido',
+        "date" : Store.getState().today
+      },
+
     };
+
+    /* @ Changes in Store */
+    Store.subscribe(() => {
+      this.setState({
+        countrys : Store.getState().countrys,
+        user     : Store.getState().user
+      });
+    });
 
     /* @ */
     this.fetchCountrys();
-
-    /* @ */
-    this.onChangeDate = this.onChangeDate.bind(this);
 
   }
 
@@ -57,9 +70,12 @@ class FormView extends React.Component{
       .then(function(response){
 
         /* @ */
-        this.setState({countrys : response});
+        Store.dispatch({
+          type      : 'UPDATE_COUNTRYS',
+          countrys  : response
+        });
 
-      }.bind(this));
+      });
 
   }
 
@@ -76,77 +92,102 @@ class FormView extends React.Component{
 
   }
 
-
+  /**
+   * 
+   * @param {*} e - Event form submit  
+   */
   addVisit(e){
 
     /* @ */
     e.preventDefault();
 
     /* @ */
-    let refVisitant      = this.props.visitants,
-        newVisitantReact = {
-          name    : this.refs.visit_name.value,
-          country : this.refs.visit_country.value,
-          date    : this.refs.visit_date.value
-        },
-        newVisitantStatic= Object.assign({},newVisitantReact);
+    let visit = {
+      name    : this.refs.visit_name.value,
+      country : this.refs.visit_country.value,
+      date    : this.refs.visit_date.value
+    };
 
     /* @ */
-    refVisitant.push(newVisitantReact);
+    Store.dispatch({
+      type : "ADD_VISIT",
+      visit: visit
+    });
 
     /* @ */
-    this.props.onSubmit(refVisitant);
-    this.props.onShowOutput(newVisitantStatic);
+    Store.dispatch({
+      type : "UPDATE_USER",
+      user : visit
+    });
 
   }
 
-  
-  onChangeName(e){
-    this.props.onChangeName(e.target.value);
+  /**
+   * @param {eventTarget} e - Event from input text (name)
+   */
+  handleChangeName(e){
+
+    /* @ */
+    Store.dispatch({
+      type : "UPDATE_USER",
+      user : Object.assign( {},
+                            Store.getState().user,
+                            {name: e.target.value})
+    });
+
   }
 
-  onChangeDate(e){
-    this.props.onChangeDate(e.target.value);
+  /**
+   * 
+   * @param {eventTarget} e - Event from input date (birthday) 
+   */
+  handleChangeDate(e){
+    Store.dispatch({
+      type    : "UPDATE_USER",
+      user    : Object.assign( {},
+                               Store.getState().user,
+                               {date: e.target.value})
+    });
   }
 
   render(){
     return(
       <section>
 
-        <form onSubmit={this.addVisit.bind(this)}>
+        <form onSubmit={this.addVisit}>
           <fieldset>
             <label>Nombre</label> 
             <input type="text"  placeholder="Tu Nombre aquí" 
                                 ref="visit_name" 
-                                onKeyDown={this.onChangeName.bind(this)} 
-                                onKeyUp={this.onChangeName.bind(this)} 
-                                onKeyPress={this.onChangeName.bind(this)} />
+                                onKeyDown={this.handleChangeName} 
+                                onKeyUp={this.handleChangeName} 
+                                onKeyPress={this.handleChangeName} />
           </fieldset>
           <fieldset>
             <label>Pais</label>
             <select ref="visit_country">
               {
-                this.state.countrys.map(this.countryElement.bind(this))
+                this.state.countrys.map(this.countryElement)
               }
             </select>
           </fieldset>
           <fieldset>
             <label>Cumpleaños:<sub>(dd/mm/aaaa)</sub></label>
-            <input type="date" ref="visit_date" max={this.state.today}
-                                                onClick={this.onChangeDate}
-                                                onChange={this.onChangeDate}
-                                                onKeyDown={this.onChangeDate}
-                                                onKeyPress={this.onChangeDate}
-                                                onKeyUp={this.onChangeDate} />
+            <input type="date" ref="visit_date" max={Store.getState().today}
+                                                onClick={this.handleChangeDate}
+                                                onChange={this.handleChangeDate}
+                                                onKeyDown={this.handleChangeDate}
+                                                onKeyPress={this.handleChangeDate}
+                                                onKeyUp={this.handleChangeDate} />
           </fieldset>
           <button>Saludar</button>
         </form>
 
         {          
-          <output style={(this.props.user.name === '' || this.props.user.date === '' ? {display:'none'} : {})} >
-            Hola {this.props.user.name} de {this.props.user.country} el día {new Date(this.props.user.date.reverse()).getDate()} 
-            del mes {new Date(this.props.user.date.reverse()).getMonth() + 1} tendrás {Math.abs(
-                                                                                        new Date(this.props.user.date.reverse()).getFullYear() - new Date().getFullYear()
+          <output style={(this.state.user.name === '' || this.state.user.date === '' ? {display:'none'} : {})} >
+            Hola {this.state.user.name} de {this.state.user.country} el día {new Date(this.state.user.date.reverse()).getDate()} 
+             del mes {new Date(this.state.user.date.reverse()).getMonth() + 1} tendrás {Math.abs(
+                                                                                        new Date(this.state.user.date.reverse()).getFullYear() - new Date().getFullYear()
                                                                                       )} años
           </output>
         }

@@ -5,6 +5,9 @@
 import React            from 'react';
 import ReactDOM         from 'react-dom';
 
+/**
+ * @desc 
+ */
 import App              from './assets/js/App';
 
 /**
@@ -12,4 +15,7 @@ import App              from './assets/js/App';
  */
 import './all.css';
 
+/**
+ * @desc
+ */
 ReactDOM.render(<App />,document.getElementById('root'));
